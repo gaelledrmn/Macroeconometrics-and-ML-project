@@ -13,7 +13,7 @@ library(fbi)
 #### Import data ####
 
 # Setting start and end date of the analysis
-  start_date = "1960-01-01"
+start_date = "1960-01-01"
 end_date = "2019-12-01"         # We might want to leave out the covid period
 
 
