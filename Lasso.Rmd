@@ -60,11 +60,11 @@ table(sapply(x, function(x) sum(length(which(is.na(x))))))
 We plot the two time seriesof interest
 
 ```{r}
-plot(x$DPCERA3M086SBEA, type = "l",ylab = var_desc$description[var_desc$fred == "DPCERA3M086SBEA"])
+plot(time, x$DPCERA3M086SBEA, type = "l",ylab = var_desc$description[var_desc$fred == "DPCERA3M086SBEA"])
 ```
 
 ```{r}
-plot(x$RPI, type = "l",ylab = var_desc$description[var_desc$fred == "RPI"])
+plot(time,x$RPI, type = "l",ylab = var_desc$description[var_desc$fred == "RPI"])
 ```
 
 # Let standardize the data
