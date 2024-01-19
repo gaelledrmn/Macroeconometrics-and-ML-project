@@ -100,8 +100,6 @@ Lasso_function <- function(p, r, alpha, variable, remove, plot,residuals){
   if (p <= (r)){
     print("Must have p > r")
   }
-  print("d =")
-  print((nb_N - p)/(r+1))
   
   #Remove unwanted variables
   x_st <- x_standard[,-which(names(x_standard)==remove)]
