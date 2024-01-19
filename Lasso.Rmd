@@ -324,6 +324,7 @@ remove = "RPI"
 Lasso_fit <- Lasso_function(p = p, r = r, alpha = alpha, variable = variable,remove = remove, plot = TRUE, residuals = FALSE)
 
 print(Lasso_fit$lambda)
+print((log(nb_N-2)/nb_T)^(1/2))
 print(Lasso_fit$dev.ratio)
 ```
 
@@ -373,6 +374,7 @@ remove = "DPCERA3M086SBEA"
 Lasso_fit <- Lasso_function(p = p, r = r, alpha = alpha, variable = variable,remove = remove, plot = TRUE, residuals = FALSE)
 
 print(Lasso_fit$lambda)
+print((log(nb_N-2)/nb_T)^(1/2))
 print(Lasso_fit$dev.ratio)
 ```
 
