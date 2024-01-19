@@ -57,14 +57,14 @@ x <- raw_data[, colSums(is.na(raw_data)) == 0]
 #We check if there are still missing values
 table(sapply(x, function(x) sum(length(which(is.na(x))))))
 ```
-We plot the two time series of interest
+We plot the two time series of interest 
 
 ```{r}
-plot(time, x$DPCERA3M086SBEA, type = "l",ylab = var_desc$description[var_desc$fred == "DPCERA3M086SBEA"])
+plot(x$DPCERA3M086SBEA,type = "l",ylab = var_desc$description[var_desc$fred == "DPCERA3M086SBEA"])
 ```
 
 ```{r}
-plot(time,x$RPI, type = "l",ylab = var_desc$description[var_desc$fred == "RPI"])
+plot(x$RPI, type = "l",ylab = var_desc$description[var_desc$fred == "RPI"])
 ```
 
 # Let standardize the data
@@ -96,26 +96,24 @@ The standardized data looks similar as what we got in class
 
 function for lasso regression
 ```{r}
-Lasso_function <- function(p, r, alpha, variable, remove, plot,residuals){
+Lasso_function <- function(p, r, alpha, variable, plot,residuals){
   if (p <= (r)){
     print("Must have p > r")
   }
-  
-  #Remove unwanted variables
-  x_st <- x_standard[,-which(names(x_standard)==remove)]
+
   #outcome
-  Y <- x_st[(p+1):nb_T,which(names(x_st)==variable)]
+  Y <- x_standard[(p+1):nb_T,which(names(x_standard)==variable)]
   #initialize endogenous variable
-  X_st <- x_st[p:(nb_T-1),which(names(x_st)==variable)]
+  X_st <- x_standard[p:(nb_T-1),which(names(x_standard)==variable)]
   if (p >= 2){
     for (i in seq(1,p-1)){
-      Y_lag <- x_st[seq(p-i,nb_T-1-i),which(names(x_st)==variable)]
+      Y_lag <- x_standard[seq(p-i,nb_T-1-i),which(names(x_standard)==variable)]
       X_st <- cbind(X_st,Y_lag)
     }
   }
   #exogenous varaibles and lag
   for (i in seq(0,r)){
-    temp <- x_st[(p-i):(nb_T-i-1),-which(names(x_st)==variable)]
+    temp <- x_standard[(p-i):(nb_T-i-1),-which(names(x_standard)==variable)]
     X_st <- cbind(X_st,temp)
   }
   X_st <- as.matrix(X_st)
@@ -161,19 +159,19 @@ list_coeff <- function(Lasso_fit){
   coef_X <- coefficients[seq(14,length(coefficients))]
   FRED <- row.names(Lasso_fit$beta)[seq(14,length(coefficients))]
   
-  #We initialize the dataframe, there is 130 variables for each lag
-  coefficients_X <- data.frame(coeff_X = coef_X[seq(1,130)])
+  #We initialize the dataframe, there is 131 variables for each lag
+  coefficients_X <- data.frame(coeff_X = coef_X[seq(1,131)])
   coefficients_X$lag <- 1
-  coefficients_X$FRED <- FRED[seq(1,130)]
+  coefficients_X$FRED <- FRED[seq(1,131)]
   #Remove varaibles with null coeff
   coefficients_X <- coefficients_X[coefficients_X$coeff_X !=0,]
   
   #For other lag
   for (i in (1:11)){
-    coeff_X <- coef_X[seq(i*130+1,(i+1)*130)]
+    coeff_X <- coef_X[seq(i*131+1,(i+1)*131)]
     temp <- data.frame(coeff_X)
     temp$lag <- i+1
-    temp$FRED <- FRED[seq(i*130+1,(i+1)*130)]
+    temp$FRED <- FRED[seq(i*131+1,(i+1)*131)]
     
     #Remove varaibles with null coeff
     temp <- temp[temp$coeff_X != 0,]
@@ -193,13 +191,12 @@ list_coeff <- function(Lasso_fit){
 
 Here we compute the standardized forecasts
 ```{r}
-forecasting <- function(Lasso_fit, variable, remove, h, standard){
-    #Remove unwanted variables
-    x_st <- x_standard[,-which(names(x_standard)==remove)]
+forecasting <- function(Lasso_fit, variable, h, standard){
+
     #outcome
-    Y <- x_st[,which(names(x_st)==variable)]
+    Y <- x_standard[,which(names(x_standard)==variable)]
     #other variables
-    X_st <- x_st[,-which(names(x_st)==variable)]
+    X_st <- x_standard[,-which(names(x_standard)==variable)]
     
     list_coef <- list_coeff(Lasso_fit)
     
@@ -255,8 +252,8 @@ forecasting <- function(Lasso_fit, variable, remove, h, standard){
 Forecasting error using naive forecasting
 
 ```{r}
-forecasting_error <- function(Lasso_fit, variable, remove, h,sigma){
-  Forecasts <- forecasting(Lasso_fit, variable, remove, h, standard = FALSE)
+forecasting_error <- function(Lasso_fit, variable, h,sigma){
+  Forecasts <- forecasting(Lasso_fit, variable, h, standard = FALSE)
   
   min <- c()
   max <- c()
@@ -310,7 +307,7 @@ plot_forecast <- function(forecasts_data, variable, start){
 
 # Real personal consumption
 
-Now we try to find the best Lasso-VAR model to fit real personal consumption, we also remove the real personal income as we study it too.
+Now we try to find the best Lasso-VAR model to fit real personal consumption.
 
 We take p and r large, useless variables will be removed with the lasso.
 ```{r}
@@ -318,20 +315,19 @@ p = 13
 r =12
 alpha = 1
 variable = "DPCERA3M086SBEA"
-remove = "RPI"
 
 
-Lasso_fit <- Lasso_function(p = p, r = r, alpha = alpha, variable = variable,remove = remove, plot = TRUE, residuals = FALSE)
+Lasso_fit <- Lasso_function(p = p, r = r, alpha = alpha, variable = variable, plot = TRUE, residuals = FALSE)
 
 print(Lasso_fit$lambda)
-print((log(nb_N-2)/nb_T)^(1/2))
+print((log(nb_N-1)/nb_T)^(1/2))
 print(Lasso_fit$dev.ratio)
 ```
 
 
 We extract the residuals to compute the forecasting error
 ```{r}
-residual <- Lasso_function(p = p, r = r, alpha = alpha, variable = variable,remove = remove, plot = FALSE, residuals = TRUE)
+residual <- Lasso_function(p = p, r = r, alpha = alpha, variable = variable, plot = FALSE, residuals = TRUE)
 sigma <- sd(residual)
 ```
 Number of variables kept, for the outcome
@@ -346,10 +342,32 @@ Number of variables kept, for the exogenous variables
 coefficients_X <- Lasso_fit$beta[seq(14,length(Lasso_fit$beta))]
 length(coefficients_X[coefficients_X !=0])
 ```
+We get the varaibles with higher coefficient in absolute value (X_st correspond to Y_lag of order 1)
+```{r}
+VAR_names <- row.names(Lasso_fit$beta)
+coeffs <- Lasso_fit$beta[seq(1,length(Lasso_fit$beta))]
+table_coefficients <- data.frame(VAR_names, coeffs)
+
+lags <- c(1,2,3,4,5,6,7,8,9,10,11,12,13)
+for (i in seq(1,13)){
+  for (k in seq(1,121)){
+    lags <- c(lags,i)
+  }
+}
+
+table_coefficients$lags <- lags
+table_coefficients$abs_coff <- abs(table_coefficients$coeffs)
+
+table_coefficients <-table_coefficients[order(table_coefficients$abs_coff,decreasing = TRUE),]
+
+head(table_coefficients)
+
+```
+
 
 We plot the forecasted values
 ```{r}
-forecast_data <- forecasting_error(Lasso_fit, variable, remove, h= 15,sigma)
+forecast_data <- forecasting_error(Lasso_fit, variable, h= 15,sigma)
 plot_forecast(forecast_data, variable, start=1960)
 
 ```
@@ -368,21 +386,22 @@ p = 13
 r =12
 alpha = 1
 variable = "RPI"
-remove = "DPCERA3M086SBEA"
 
 
-Lasso_fit <- Lasso_function(p = p, r = r, alpha = alpha, variable = variable,remove = remove, plot = TRUE, residuals = FALSE)
+Lasso_fit <- Lasso_function(p = p, r = r, alpha = alpha, variable = variable, plot = TRUE, residuals = FALSE)
 
 print(Lasso_fit$lambda)
-print((log(nb_N-2)/nb_T)^(1/2))
+print((log(nb_N-1)/nb_T)^(1/2))
 print(Lasso_fit$dev.ratio)
 ```
 
 We extract the residuals to compute the forecasting error
 ```{r}
-residual <- Lasso_function(p = p, r = r, alpha = alpha, variable = variable,remove = remove, plot = FALSE, residuals = TRUE)
+residual <- Lasso_function(p = p, r = r, alpha = alpha, variable = variable, plot = FALSE, residuals = TRUE)
 sigma <- sd(residual)
 ```
+
+
 Number of variables kept, for the outcome
 ```{r}
 coefficients_Y <- Lasso_fit$beta[1:13]
@@ -394,11 +413,33 @@ Number of variables kept, for the exogenous variables
 coefficients_X <- Lasso_fit$beta[seq(14,length(Lasso_fit$beta))]
 length(coefficients_X[coefficients_X !=0])
 ```
+We get the varaibles with higher coefficient in absolute value (X_st correspond to Y_lag of order 1)
+```{r}
+VAR_names <- row.names(Lasso_fit$beta)
+coeffs <- Lasso_fit$beta[seq(1,length(Lasso_fit$beta))]
+table_coefficients <- data.frame(VAR_names, coeffs)
+
+lags <- c(1,2,3,4,5,6,7,8,9,10,11,12,13)
+for (i in seq(1,13)){
+  for (k in seq(1,121)){
+    lags <- c(lags,i)
+  }
+}
+
+table_coefficients$lags <- lags
+table_coefficients$abs_coff <- abs(table_coefficients$coeffs)
+
+table_coefficients <-table_coefficients[order(table_coefficients$abs_coff,decreasing = TRUE),]
+
+head(table_coefficients)
+
+```
+
 
 
 We plot the forecasted values
 ```{r}
-forecast_data <- forecasting_error(Lasso_fit, variable, remove, h= 15,sigma)
+forecast_data <- forecasting_error(Lasso_fit, variable, h= 15,sigma)
 plot_forecast(forecast_data, variable, start=1960)
 
 ```
