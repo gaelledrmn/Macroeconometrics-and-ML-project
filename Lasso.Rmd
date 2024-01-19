@@ -40,7 +40,7 @@ dates <- data$date
 
 ## Data formatting
 
-We remove useless column and columns with NA values
+We remove useless columns and columns with NA values
 ```{r}
 #Remove the first column "date"
 raw_data <- data[,seq(2,length(data))]
@@ -54,10 +54,10 @@ x <- raw_data[, colSums(is.na(raw_data)) == 0]
 ```
 
 ```{r}
-#We check if there still missing values
+#We check if there are still missing values
 table(sapply(x, function(x) sum(length(which(is.na(x))))))
 ```
-We plot the two time seriesof interest
+We plot the two time series of interest
 
 ```{r}
 plot(time, x$DPCERA3M086SBEA, type = "l",ylab = var_desc$description[var_desc$fred == "DPCERA3M086SBEA"])
@@ -80,7 +80,7 @@ for (col in names(x)){
 #Time variable
 time <- c(1:nrow(x_standard))/12 + 1960
 
-#NUmber of period
+#Number of period
 nb_T <- nrow(x_standard)
 
 #Number of variable
@@ -145,7 +145,7 @@ Lasso_function <- function(p, r, alpha, variable, remove, plot,residuals){
 
 
 
- We can now extract the coefficients to try to forecast the series, we start by getting the coefficients and the corresponding lag
+We can now extract the coefficients to try to forecast the series, we start by getting the coefficients and the corresponding lag
 ```{r}
 list_coeff <- function(Lasso_fit){
   coefficients <- Lasso_fit$beta
@@ -310,9 +310,9 @@ plot_forecast <- function(forecasts_data, variable, start){
 
 # Real personal consumption
 
-Now we try to find the best Lasso-VAR model to fit real personal consumption, We also remove the real personal income as we study it too.
+Now we try to find the best Lasso-VAR model to fit real personal consumption, we also remove the real personal income as we study it too.
 
-We take p and r large, useless varaibles will be removed with the lasso
+We take p and r large, useless variables will be removed with the lasso.
 ```{r}
 p = 13
 r =12
@@ -329,7 +329,7 @@ print(Lasso_fit$dev.ratio)
 ```
 
 
-We extract the residuals to to compute the forecasting error
+We extract the residuals to compute the forecasting error
 ```{r}
 residual <- Lasso_function(p = p, r = r, alpha = alpha, variable = variable,remove = remove, plot = FALSE, residuals = TRUE)
 sigma <- sd(residual)
@@ -378,7 +378,7 @@ print((log(nb_N-2)/nb_T)^(1/2))
 print(Lasso_fit$dev.ratio)
 ```
 
-We extract the residuals to to compute the forecasting error
+We extract the residuals to compute the forecasting error
 ```{r}
 residual <- Lasso_function(p = p, r = r, alpha = alpha, variable = variable,remove = remove, plot = FALSE, residuals = TRUE)
 sigma <- sd(residual)
