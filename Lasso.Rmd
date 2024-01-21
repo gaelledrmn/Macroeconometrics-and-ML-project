@@ -317,7 +317,8 @@ alpha = 1
 variable = "DPCERA3M086SBEA"
 
 
-Lasso_fit <- Lasso_function(p = p, r = r, alpha = alpha, variable = variable, plot = TRUE, residuals = FALSE)
+Lasso_fit <- Lasso_function(p = p, r = r, alpha = alpha, variable = variable,
+                            plot = TRUE, residuals = FALSE)
 
 print(Lasso_fit$lambda)
 print((log(nb_N-1)/nb_T)^(1/2))
@@ -327,7 +328,8 @@ print(Lasso_fit$dev.ratio)
 
 We extract the residuals to compute the forecasting error
 ```{r}
-residual <- Lasso_function(p = p, r = r, alpha = alpha, variable = variable, plot = FALSE, residuals = TRUE)
+residual <- Lasso_function(p = p, r = r, alpha = alpha, variable = variable,
+                           plot = FALSE, residuals = TRUE)
 sigma <- sd(residual)
 ```
 Number of variables kept, for the outcome
@@ -388,7 +390,8 @@ alpha = 1
 variable = "RPI"
 
 
-Lasso_fit <- Lasso_function(p = p, r = r, alpha = alpha, variable = variable, plot = TRUE, residuals = FALSE)
+Lasso_fit <- Lasso_function(p = p, r = r, alpha = alpha, variable = variable,
+                            plot = TRUE, residuals = FALSE)
 
 print(Lasso_fit$lambda)
 print((log(nb_N-1)/nb_T)^(1/2))
@@ -397,7 +400,8 @@ print(Lasso_fit$dev.ratio)
 
 We extract the residuals to compute the forecasting error
 ```{r}
-residual <- Lasso_function(p = p, r = r, alpha = alpha, variable = variable, plot = FALSE, residuals = TRUE)
+residual <- Lasso_function(p = p, r = r, alpha = alpha, variable = variable,
+                           plot = FALSE, residuals = TRUE)
 sigma <- sd(residual)
 ```
 
